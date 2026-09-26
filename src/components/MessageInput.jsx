@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
-import { Image, Send, X } from "lucide-react";
+import { useAgentStore } from "../store/useAgentStore";
+import { Image, Send, X, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 
 const MessageInput = () => {
@@ -8,6 +9,14 @@ const MessageInput = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
   const { sendMessage } = useChatStore();
+  const { draftMessage, clearDraftMessage, setIsAgentModalOpen } = useAgentStore();
+
+  useEffect(() => {
+    if (draftMessage) {
+      setText(draftMessage);
+      clearDraftMessage();
+    }
+  }, [draftMessage, clearDraftMessage]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -88,8 +97,18 @@ const MessageInput = () => {
 
           <button
             type="button"
-            className={`hidden sm:flex btn btn-circle
-                     ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}
+            className="btn btn-ghost btn-circle btn-sm sm:btn-md text-primary hover:bg-primary/10"
+            onClick={() => setIsAgentModalOpen(true)}
+            title="Open AI Assistant (Summarize, Action Items, Smart Reply)"
+          >
+            <Sparkles size={20} />
+          </button>
+
+          <button
+            type="button"
+            className={`hidden sm:flex btn btn-circle btn-sm sm:btn-md ${
+              imagePreview ? "text-emerald-500" : "text-zinc-400"
+            }`}
             onClick={() => fileInputRef.current?.click()}
           >
             <Image size={20} />
@@ -97,13 +116,14 @@ const MessageInput = () => {
         </div>
         <button
           type="submit"
-          className="btn btn-sm btn-circle"
+          className="btn btn-sm sm:btn-md btn-circle btn-primary"
           disabled={!text.trim() && !imagePreview}
         >
-          <Send size={22} />
+          <Send size={20} />
         </button>
       </form>
     </div>
   );
 };
+
 export default MessageInput;

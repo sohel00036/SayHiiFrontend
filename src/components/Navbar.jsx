@@ -1,12 +1,18 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { LogOut, MessageSquare, Settings, Sparkles } from "lucide-react";
-import ChatSearchModal from "./ChatSearchModal";
+import { useAgentStore } from "../store/useAgentStore";
+import { LogOut, MessageSquare, Settings, Sparkles, ListTodo } from "lucide-react";
+import AiAgentModal from "./AiAgentModal";
+import TaskManagerModal from "./TaskManagerModal";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const {
+    isAgentModalOpen,
+    setIsAgentModalOpen,
+    isTaskManagerOpen,
+    setIsTaskManagerOpen,
+  } = useAgentStore();
 
   return (
     <>
@@ -27,14 +33,25 @@ const Navbar = () => {
 
             <div className="flex items-center gap-2">
               {authUser && (
-                <button
-                  onClick={() => setIsSearchOpen(true)}
-                  className="btn btn-sm btn-primary gap-1.5 shadow-sm hover:shadow transition-all"
-                  title="Ask AI about your past chats"
-                >
-                  <Sparkles className="size-4" />
-                  <span className="hidden sm:inline font-medium">Ask Chat AI</span>
-                </button>
+                <>
+                  <button
+                    onClick={() => setIsAgentModalOpen(true)}
+                    className="btn btn-sm btn-primary gap-1.5 shadow-sm hover:shadow transition-all"
+                    title="Open AI Assistant (Summaries, Tasks, Smart Replies)"
+                  >
+                    <Sparkles className="size-4" />
+                    <span className="hidden sm:inline font-medium">AI Assistant</span>
+                  </button>
+
+                  <button
+                    onClick={() => setIsTaskManagerOpen(true)}
+                    className="btn btn-sm btn-ghost border border-base-300 gap-1.5 hover:bg-emerald-500/10 hover:text-emerald-500 transition-all"
+                    title="View Action Items & Tasks"
+                  >
+                    <ListTodo className="size-4 text-emerald-500" />
+                    <span className="hidden md:inline font-medium">Tasks</span>
+                  </button>
+                </>
               )}
 
               <Link to={"/settings"} className="btn btn-sm gap-2 transition-colors">
@@ -66,9 +83,19 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* RAG Chat Search Modal */}
-      <ChatSearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      {/* AI Agent Modal (RAG search, Summarization, Action Items, Smart Reply) */}
+      <AiAgentModal
+        isOpen={isAgentModalOpen}
+        onClose={() => setIsAgentModalOpen(false)}
+      />
+
+      {/* Task Manager Modal */}
+      <TaskManagerModal
+        isOpen={isTaskManagerOpen}
+        onClose={() => setIsTaskManagerOpen(false)}
+      />
     </>
   );
 };
+
 export default Navbar;

@@ -1,10 +1,12 @@
-import { X, Bot } from "lucide-react";
+import { X, Bot, Sparkles, ListTodo } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
+import { useAgentStore } from "../store/useAgentStore";
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
   const { onlineUsers } = useAuthStore();
+  const { setIsAgentModalOpen, setIsTaskManagerOpen } = useAgentStore();
 
   if (!selectedUser) return null;
 
@@ -38,12 +40,38 @@ const ChatHeader = () => {
           </div>
         </div>
 
-        {/* Close button */}
-        <button onClick={() => setSelectedUser(null)}>
-          <X />
-        </button>
+        {/* Header Action Buttons */}
+        <div className="flex items-center gap-1.5">
+          {!selectedUser.isBot && (
+            <>
+              <button
+                onClick={() => setIsAgentModalOpen(true)}
+                className="btn btn-xs btn-ghost gap-1 text-primary hover:bg-primary/10"
+                title="AI Assistant for this conversation"
+              >
+                <Sparkles className="size-3.5" />
+                <span className="hidden md:inline font-medium">AI Agent</span>
+              </button>
+
+              <button
+                onClick={() => setIsTaskManagerOpen(true)}
+                className="btn btn-xs btn-ghost gap-1 text-emerald-500 hover:bg-emerald-500/10"
+                title="View Action Items & Tasks"
+              >
+                <ListTodo className="size-3.5" />
+                <span className="hidden md:inline font-medium">Tasks</span>
+              </button>
+            </>
+          )}
+
+          {/* Close button */}
+          <button onClick={() => setSelectedUser(null)} className="btn btn-ghost btn-xs btn-circle">
+            <X className="size-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
 };
+
 export default ChatHeader;
