@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { useAgentStore } from "../store/useAgentStore";
-import { LogOut, MessageSquare, Settings, Sparkles, ListTodo } from "lucide-react";
+import { useGroupStore } from "../store/useGroupStore";
+import { LogOut, MessageSquare, Settings, Sparkles, ListTodo, Users, Bell } from "lucide-react";
 import AiAgentModal from "./AiAgentModal";
 import TaskManagerModal from "./TaskManagerModal";
+import CreateGroupModal from "./CreateGroupModal";
+import GroupInvitesModal from "./GroupInvitesModal";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore();
@@ -13,6 +16,13 @@ const Navbar = () => {
     isTaskManagerOpen,
     setIsTaskManagerOpen,
   } = useAgentStore();
+  const {
+    isCreateGroupOpen,
+    setIsCreateGroupOpen,
+    isInvitesModalOpen,
+    setIsInvitesModalOpen,
+    pendingInvites,
+  } = useGroupStore();
 
   return (
     <>
@@ -34,6 +44,7 @@ const Navbar = () => {
             <div className="flex items-center gap-2">
               {authUser && (
                 <>
+                  {/* AI Assistant Button */}
                   <button
                     onClick={() => setIsAgentModalOpen(true)}
                     className="btn btn-sm btn-primary gap-1.5 shadow-sm hover:shadow transition-all"
@@ -43,6 +54,7 @@ const Navbar = () => {
                     <span className="hidden sm:inline font-medium">AI Assistant</span>
                   </button>
 
+                  {/* Tasks Button */}
                   <button
                     onClick={() => setIsTaskManagerOpen(true)}
                     className="btn btn-sm btn-ghost border border-base-300 gap-1.5 hover:bg-emerald-500/10 hover:text-emerald-500 transition-all"
@@ -50,6 +62,20 @@ const Navbar = () => {
                   >
                     <ListTodo className="size-4 text-emerald-500" />
                     <span className="hidden md:inline font-medium">Tasks</span>
+                  </button>
+
+                  {/* Group Invites Bell (with badge if pending) */}
+                  <button
+                    onClick={() => setIsInvitesModalOpen(true)}
+                    className="btn btn-sm btn-ghost relative border border-base-300 gap-1.5 hover:bg-amber-500/10 hover:text-amber-500 transition-all"
+                    title="Group Invitations"
+                  >
+                    <Bell className="size-4" />
+                    {pendingInvites.length > 0 && (
+                      <span className="badge badge-warning badge-xs px-1 text-[10px] font-bold">
+                        {pendingInvites.length}
+                      </span>
+                    )}
                   </button>
                 </>
               )}
@@ -93,6 +119,18 @@ const Navbar = () => {
       <TaskManagerModal
         isOpen={isTaskManagerOpen}
         onClose={() => setIsTaskManagerOpen(false)}
+      />
+
+      {/* Create Group Modal */}
+      <CreateGroupModal
+        isOpen={isCreateGroupOpen}
+        onClose={() => setIsCreateGroupOpen(false)}
+      />
+
+      {/* Group Invitations Modal */}
+      <GroupInvitesModal
+        isOpen={isInvitesModalOpen}
+        onClose={() => setIsInvitesModalOpen(false)}
       />
     </>
   );

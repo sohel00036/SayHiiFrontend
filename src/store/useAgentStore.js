@@ -55,6 +55,7 @@ export const useAgentStore = create((set, get) => ({
     set({ isAgentRunning: true });
     try {
       const res = await axiosInstance.post("/ai/agent", {
+        query: instruction,
         instruction,
         targetUserId,
       });

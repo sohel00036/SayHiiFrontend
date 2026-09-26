@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
+import { useGroupStore } from "../store/useGroupStore";
 import { useAgentStore } from "../store/useAgentStore";
 import { Image, Send, X, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
@@ -8,7 +9,9 @@ const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
+
   const { sendMessage } = useChatStore();
+  const { selectedGroup, sendGroupMessage } = useGroupStore();
   const { draftMessage, clearDraftMessage, setIsAgentModalOpen } = useAgentStore();
 
   useEffect(() => {
@@ -42,10 +45,17 @@ const MessageInput = () => {
     if (!text.trim() && !imagePreview) return;
 
     try {
-      await sendMessage({
-        text: text.trim(),
-        image: imagePreview,
-      });
+      if (selectedGroup) {
+        await sendGroupMessage({
+          text: text.trim(),
+          image: imagePreview,
+        });
+      } else {
+        await sendMessage({
+          text: text.trim(),
+          image: imagePreview,
+        });
+      }
 
       // Clear form
       setText("");
@@ -83,7 +93,11 @@ const MessageInput = () => {
           <input
             type="text"
             className="w-full input input-bordered rounded-lg input-sm sm:input-md"
-            placeholder="Type a message..."
+            placeholder={
+              selectedGroup
+                ? `Message #${selectedGroup.name}...`
+                : "Type a message..."
+            }
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
